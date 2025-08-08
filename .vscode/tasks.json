@@ -1,0 +1,38 @@
+{
+	"tasks": [
+		{
+			"command": "pnpm check",
+			"detail": "      Quick code check",
+			"group": {
+				"kind": "test"
+			},
+			"icon": {
+				"id": "check"
+			},
+			"label": "Check",
+			"presentation": {
+				"reveal": "always"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		// MARK: Daily maintenance
+		{
+			"command": "pnpm install",
+			"detail": "      Install dependencies",
+			"group": {
+				"kind": "build"
+			},
+			"icon": {
+				"id": "arrow-circle-down"
+			},
+			"label": "Install Dependencies",
+			"presentation": {
+				"reveal": "always"
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		}
+	],
+	"version": "2.0.0"
+}

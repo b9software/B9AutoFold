@@ -1,0 +1,68 @@
+{
+	"activationEvents": [
+		"onStartupFinished"
+	],
+	"author": {
+		"name": "BB9z",
+		"url": "https://github.com/BB9z"
+	},
+	"capabilities": {
+		"virtualWorkspaces": true
+	},
+	"categories": [
+		"Other"
+	],
+	"contributes": {
+		"commands": [
+			{
+				"category": "B9AutoFold",
+				"command": "B9AutoFold.debugSymbols",
+				"title": "Export Symbols for Debugging"
+			}
+		]
+	},
+	"description": "Automatically fold code when opening files",
+	"devDependencies": {
+		"@biomejs/biome": "latest",
+		"@types/jest": "latest",
+		"@types/node": "22.x",
+		"@types/vscode": "1.90.0",
+		"@vscode/vsce": "latest",
+		"esbuild": "latest",
+		"jest": "latest",
+		"ts-jest": "latest",
+		"typescript": "latest"
+	},
+	"displayName": "B9AutoFold",
+	"engines": {
+		"vscode": ">=1.90.0"
+	},
+	"icon": "icon.png",
+	"keywords": [
+		"auto fold",
+		"code folding",
+		"editor",
+		"fold regions",
+		"folding",
+		"region",
+		"smart fold",
+		"折叠"
+	],
+	"license": "MIT",
+	"main": "./dist/extension.js",
+	"name": "vsx-fold",
+	"publisher": "b9software",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/b9software/B9AutoFold.git"
+	},
+	"scripts": {
+		"check": "biome check --write --unsafe && pnpm compile && jest",
+		"compile": "tsc --noEmit && node esbuild.js",
+		"package": "vsce package",
+		"test": "jest",
+		"vscode:prepublish": "rm -rf dist && node esbuild.js --production",
+		"watch": "node esbuild.js --watch"
+	},
+	"version": "0.1.0"
+}

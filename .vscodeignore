@@ -1,0 +1,13 @@
+.github
+.gitignore
+.vscode-test/**
+.vscode/**
+*.js
+**/*.map
+**/*.ts
+**/tsconfig.json
+biome.jsonc
+coverage/**
+pnpm-*.yaml
+src/**
+tests/**

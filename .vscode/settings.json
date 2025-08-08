@@ -1,0 +1,16 @@
+{
+	"[css][json][jsonc][javascript][markdown][typescript][typescriptreact]": {
+		"editor.codeActionsOnSave": {
+			"source.action.useSortedKeys.biome": "explicit",
+			"source.fixAll.biome": "explicit",
+			"source.organizeImports": "never" // biome includes import organization
+		},
+		"editor.defaultFormatter": "biomejs.biome",
+		"editor.formatOnSave": true
+	},
+	"biome.lsp.bin": "node_modules/.bin/biome",
+	"cSpell.words": [],
+	"editor.formatOnSave": true,
+	"editor.tabSize": 2,
+	"files.associations": {}
+}
