@@ -79,7 +79,16 @@ export async function copyDebugSymbols() {
 
 		const fileName = editor.document.fileName.split('/').pop() || 'unknown.ts';
 		const lineCount = editor.document.lineCount;
-		const foldingRanges = generateFoldingPlan(editor, symbols);
+		const skips = editor.selections.map((s) => `[${s.start.line}, ${s.end.line}]`).join(', ');
+		const foldingRanges = generateFoldingPlan({
+			fileName: editor.document.fileName,
+			foldedRanges: [],
+			skipRanges: editor.selections,
+			symbols: symbols,
+			targetLines: TARGET_LINE,
+			topLevelContainer: symbols.length,
+			visibleLines: editor.document.lineCount,
+		});
 		let foldRangesStr = '';
 		if (foldingRanges.length) {
 			foldRangesStr += '\n  ';
@@ -91,7 +100,7 @@ export async function copyDebugSymbols() {
 const symbols: UTSymbol[] = [
   ${documentSymbolToString(symbols)}
 ];
-check('${fileName}', ${lineCount}, symbols, [${foldRangesStr}]);
+check('${fileName}', ${lineCount}, symbols, [${skips}], [${foldRangesStr}]);
 `;
 
 		await env.clipboard.writeText(output);
@@ -102,7 +111,15 @@ check('${fileName}', ${lineCount}, symbols, [${foldRangesStr}]);
 }
 
 async function foldBySymbols(editor: TextEditor, symbols: DocumentSymbol[]): Promise<boolean> {
-	const foldingRanges = generateFoldingPlan(editor, symbols);
+	const foldingRanges = generateFoldingPlan({
+		fileName: editor.document.fileName,
+		foldedRanges: [],
+		skipRanges: editor.selections,
+		symbols: symbols,
+		targetLines: TARGET_LINE,
+		topLevelContainer: symbols.length,
+		visibleLines: editor.document.lineCount,
+	});
 	if (foldingRanges.length === 0) {
 		logDebug('No folding ranges generated');
 		return false;

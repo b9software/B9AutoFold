@@ -1,5 +1,4 @@
-import { type DocumentSymbol, FoldingRange, FoldingRangeKind, SymbolKind, type TextEditor } from 'vscode';
-import { TARGET_LINE } from './config';
+import { type DocumentSymbol, FoldingRange, FoldingRangeKind, type Range, SymbolKind } from 'vscode';
 import { debugDescription, logDebug } from './utils';
 
 /**
@@ -18,13 +17,14 @@ import { debugDescription, logDebug } from './utils';
 
 /** Folding context */
 interface FoldingContext {
-	allSymbols: DocumentSymbol[];
 	fileName: string; // Filename (for special handling)
 	/** Already folded ranges */
 	foldedRanges: FoldingRange[];
+	skipRanges: readonly Range[];
+	symbols: DocumentSymbol[];
 	/** Target lines after folding */
 	targetLines: number;
-	topLevelSymbolCount: number;
+	topLevelContainer: number;
 	/** Current visible lines */
 	visibleLines: number;
 }
@@ -36,18 +36,14 @@ interface SymbolWithDepth {
 	parent?: SymbolWithDepth;
 }
 
+// const containerKinds = [SymbolKind.Class, SymbolKind.Namespace, SymbolKind.Module, SymbolKind.Interface];
+
 /**
  * Main entry function for generating folding plan
  */
-export function generateFoldingPlan(editor: TextEditor, symbols: DocumentSymbol[]): FoldingRange[] {
-	const context: FoldingContext = {
-		allSymbols: symbols,
-		fileName: editor.document.fileName,
-		foldedRanges: [],
-		targetLines: TARGET_LINE,
-		topLevelSymbolCount: symbols.length,
-		visibleLines: editor.document.lineCount,
-	};
+export function generateFoldingPlan(context: FoldingContext): FoldingRange[] {
+	const { symbols } = context;
+	// context.topLevelContainer = symbols.filter((s) => containerKinds.includes(s.kind)).length;
 
 	// 1. Calculate total lines when not folded
 	if (context.visibleLines <= context.targetLines) {
@@ -132,7 +128,12 @@ function shouldFold(symbol: DocumentSymbol, context: FoldingContext): boolean {
 	const size = symbol.range.end.line - symbol.range.start.line + 1;
 
 	// Skip child symbols if parent symbol is already folded
-	if (isChildOfFoldedSymbol(symbol, context.foldedRanges)) {
+	if (isSymbolInFolding(symbol, context.foldedRanges)) {
+		return false;
+	}
+
+	if (isSymbolIntersectRanges(symbol, context.skipRanges)) {
+		logDebug(`${symbol.name} in skip ranges`);
 		return false;
 	}
 
@@ -155,13 +156,13 @@ function shouldFold(symbol: DocumentSymbol, context: FoldingContext): boolean {
 		case SymbolKind.Struct:
 		case SymbolKind.Class: {
 			// Classes rarely fold, unless file has many top-level symbols and space is tight
-			return context.topLevelSymbolCount > 5 && budget < 10;
+			return context.topLevelContainer > 5 && budget < 10;
 		}
 
 		case SymbolKind.Namespace:
 		case SymbolKind.Module: {
 			// Namespaces/modules similar to Classes
-			return context.topLevelSymbolCount > 5 && size > 15 && budget < 20;
+			return context.topLevelContainer > 5 && size > 15 && budget < 20;
 		}
 
 		case SymbolKind.Interface:
@@ -208,8 +209,21 @@ function handleTestFileFolding(symbol: DocumentSymbol, remainingBudget: number):
 /**
  * Check if symbol is a child of already folded symbol
  */
-function isChildOfFoldedSymbol(symbol: DocumentSymbol, alreadyFolded: FoldingRange[]): boolean {
-	return alreadyFolded.some((fold) => fold.start <= symbol.range.start.line && fold.end >= symbol.range.end.line);
+function isSymbolInFolding(symbol: DocumentSymbol, ranges: FoldingRange[]): boolean {
+	const symbolStart = symbol.range.start.line;
+	const symbolEnd = symbol.range.end.line;
+	return ranges.some((fold) => fold.start <= symbolStart && fold.end >= symbolEnd);
+}
+
+function isSymbolIntersectRanges(symbol: DocumentSymbol, ranges: readonly Range[]): boolean {
+	const symbolStart = symbol.range.start.line;
+	const symbolEnd = symbol.range.end.line;
+
+	return ranges.some((range) => {
+		const rangeStart = range.start.line;
+		const rangeEnd = range.end.line;
+		return !(symbolEnd < rangeStart || symbolStart > rangeEnd);
+	});
 }
 
 /**

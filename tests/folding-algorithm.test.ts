@@ -1,4 +1,5 @@
-import { DocumentSymbol, Position, Range, SymbolKind, type TextEditor } from 'vscode';
+import { DocumentSymbol, Position, Range, SymbolKind } from 'vscode';
+import { TARGET_LINE } from '../src/config';
 import { generateFoldingPlan } from '../src/folding-algorithm';
 
 type UTSymbol = [name: string, kind: SymbolKind, from: number, to: number, children: UTSymbol[]];
@@ -15,30 +16,22 @@ function makeSymbol(info: UTSymbol): DocumentSymbol {
 	return result;
 }
 
-// Mock TextEditor
-function createMockEditor(fileName: string, totalLines: number): TextEditor {
-	return {
-		document: {
-			fileName,
-			lineCount: totalLines,
-		},
-		visibleRanges: [
-			{
-				end: { character: 0, line: totalLines - 1 },
-				start: { character: 0, line: 0 },
-			},
-		],
-	} as unknown as TextEditor;
-}
-
 function check(
 	fileName: string,
 	lineCount: number,
 	symbols: UTSymbol[],
+	skip: [start: number, end: number][],
 	foldRanges: [start: number, end: number][],
 ): void {
-	const editor = createMockEditor(fileName, lineCount);
-	const foldingRanges = generateFoldingPlan(editor, symbols.map(makeSymbol));
+	const foldingRanges = generateFoldingPlan({
+		fileName,
+		foldedRanges: [],
+		skipRanges: skip.map(([start, end]) => new Range(start, 0, end, 0)),
+		symbols: symbols.map(makeSymbol),
+		targetLines: TARGET_LINE,
+		topLevelContainer: symbols.length,
+		visibleLines: lineCount,
+	});
 	const result = foldingRanges.map((r) => [r.start, r.end]);
 	expect(result).toEqual(foldRanges);
 }
@@ -57,7 +50,7 @@ describe('Folding Algorithm Tests', () => {
 				],
 			],
 		];
-		check('test.ts', 30, symbols, []);
+		check('test.ts', 30, symbols, [], []);
 	});
 
 	it('should fold methods in a class when file is large', () => {
@@ -77,12 +70,18 @@ describe('Folding Algorithm Tests', () => {
 			],
 		];
 		// All methods should be folded
-		check('manager.ts', 120, symbols, [
-			[18, 23],
-			[33, 41],
-			[48, 62],
-			[77, 85],
-		]);
+		check(
+			'manager.ts',
+			120,
+			symbols,
+			[],
+			[
+				[18, 23],
+				[33, 41],
+				[48, 62],
+				[77, 85],
+			],
+		);
 	});
 
 	it('should fold interfaces and enums when space is limited', () => {
@@ -110,11 +109,17 @@ describe('Folding Algorithm Tests', () => {
 				],
 			],
 		];
-		check('interfaces.ts', 180, symbols, [
-			[9, 54],
-			[56, 61],
-			[64, 69],
-		]);
+		check(
+			'interfaces.ts',
+			180,
+			symbols,
+			[],
+			[
+				[9, 54],
+				[56, 61],
+				[64, 69],
+			],
+		);
 	});
 
 	it('should handle test files specially - fold containers but not describe blocks', () => {
@@ -131,7 +136,7 @@ describe('Folding Algorithm Tests', () => {
 			],
 		];
 		// In test files, describe blocks shouldn't be folded, but outer containers should be
-		check('some.test.ts', 130, symbols, [[17, 125]]);
+		check('some.test.ts', 130, symbols, [], [[17, 125]]);
 	});
 
 	it('should fold large variables but not small ones', () => {
@@ -149,11 +154,17 @@ describe('Folding Algorithm Tests', () => {
 			],
 			['smallVar', SymbolKind.Variable, 102, 105, []],
 		];
-		check('data.ts', 110, symbols, [
-			[1, 24],
-			[31, 49],
-			[74, 99],
-		]);
+		check(
+			'data.ts',
+			110,
+			symbols,
+			[],
+			[
+				[1, 24],
+				[31, 49],
+				[74, 99],
+			],
+		);
 	});
 
 	it('should respect size thresholds based on remaining space', () => {
@@ -163,7 +174,7 @@ describe('Folding Algorithm Tests', () => {
 			['LargeMethod', SymbolKind.Method, 17, 50, []], // 34 lines
 		];
 		// Should prioritize folding large methods, may fold medium methods based on remaining space, generally don't fold small methods
-		check('methods.ts', 60, symbols, [[17, 50]]);
+		check('methods.ts', 60, symbols, [], [[17, 50]]);
 	});
 
 	it('should fold all top-level symbols in large files', () => {
@@ -183,22 +194,28 @@ describe('Folding Algorithm Tests', () => {
 			['e3', SymbolKind.Enum, 210, 217, []],
 			['c9', SymbolKind.Class, 220, 238, []],
 		];
-		check('schema file', 418, symbols, [
-			[2, 5],
-			[7, 10],
-			[15, 51],
-			[55, 67],
-			[69, 75],
-			[78, 92],
-			[97, 125],
-			[127, 135],
-			[137, 147],
-			[149, 152],
-			[155, 191],
-			[194, 208],
-			[210, 217],
-			[220, 238],
-		]);
+		check(
+			'schema file',
+			418,
+			symbols,
+			[],
+			[
+				[2, 5],
+				[7, 10],
+				[15, 51],
+				[55, 67],
+				[69, 75],
+				[78, 92],
+				[97, 125],
+				[127, 135],
+				[137, 147],
+				[149, 152],
+				[155, 191],
+				[194, 208],
+				[210, 217],
+				[220, 238],
+			],
+		);
 	});
 
 	it('should correctly fold nested symbols with multi-level children', () => {
@@ -227,11 +244,17 @@ describe('Folding Algorithm Tests', () => {
 				],
 			],
 		];
-		check('big-func.ts', 59, symbols, [
-			[19, 57],
-			[21, 24],
-			[36, 44],
-		]);
+		check(
+			'big-func.ts',
+			59,
+			symbols,
+			[],
+			[
+				[19, 57],
+				[21, 24],
+				[36, 44],
+			],
+		);
 	});
 
 	it('should fold deeply nested properties', () => {
@@ -373,20 +396,44 @@ describe('Folding Algorithm Tests', () => {
 				],
 			],
 		];
-		check('Text.tsx', 123, symbols, [
-			[11, 57],
-			[12, 25],
-			[26, 36],
-			[37, 44],
-			[45, 50],
-			[51, 53],
-			[54, 56],
-			[83, 119],
-		]);
+		check(
+			'Text.tsx',
+			123,
+			symbols,
+			[],
+			[
+				[11, 57],
+				[12, 25],
+				[26, 36],
+				[37, 44],
+				[45, 50],
+				[51, 53],
+				[54, 56],
+				[83, 119],
+			],
+		);
 	});
 
 	it('should handle empty symbols gracefully', () => {
 		const symbols: UTSymbol[] = [];
-		check('empty.ts', 10, symbols, []);
+		check('empty.ts', 10, symbols, [], []);
+	});
+
+	it('should respect skip ranges and not fold overlapping symbols', () => {
+		const symbols: UTSymbol[] = [
+			['method1', SymbolKind.Method, 12, 15, []],
+			['method2', SymbolKind.Method, 25, 30, []],
+			['method3', SymbolKind.Method, 35, 45, []],
+		];
+		check(
+			'test-skip.ts',
+			50,
+			symbols,
+			[[40, 41]],
+			[
+				[12, 15],
+				[25, 30],
+			],
+		);
 	});
 });

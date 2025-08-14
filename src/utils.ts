@@ -1,6 +1,6 @@
 import * as path from 'node:path';
 import { inspect } from 'node:util';
-import { FoldingRange, Range, type Uri } from 'vscode';
+import { FoldingRange, Range, Selection, type Uri } from 'vscode';
 import { Engine } from './editor-engine';
 
 export async function delay(ms: number): Promise<void> {
@@ -51,12 +51,15 @@ function timestamp() {
 	}
 }
 
+export function debugDescription(selection: Selection): string;
 export function debugDescription(foldingRange: FoldingRange): string;
 export function debugDescription(range: Range): string;
-export function debugDescription(value: FoldingRange | Range): string {
+export function debugDescription(value: FoldingRange | Range | Selection): string {
 	if (DEBUG) {
 		if (value instanceof FoldingRange) {
 			return `<FoldingRange L${value.start}-${value.end}>`;
+		} else if (value instanceof Selection) {
+			return `<Selection anchor: ${value.anchor.line}, active: ${value.active.line}, L${value.start.line}-${value.end.line}>`;
 		} else if (value instanceof Range) {
 			return `<Range L${value.start.line}-${value.end.line}>`;
 		} else {

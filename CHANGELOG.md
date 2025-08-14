@@ -2,12 +2,10 @@
 
 <!-- https://keepachangelog.com -->
 
-## [Unreleased]
+## [0.1.1] - 2025-08-14
 
-- Initial release
+- Fix: Avoid folding target lines when jumping to files
 
 ## [0.1.0] - 2025-08-13
-
-### Added
 
 - Initial Beta release.

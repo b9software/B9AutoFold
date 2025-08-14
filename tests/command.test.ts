@@ -29,7 +29,8 @@ describe('Command Tests', () => {
 					fileName: '/path/to/test.ts',
 					lineCount: 100,
 				} as TextEditor['document'],
-			};
+				selections: [],
+			} as unknown as TextEditor;
 
 			// Setup mock symbols
 			mockSymbols = [
@@ -82,7 +83,7 @@ const symbols: UTSymbol[] = [
   ]],
   ['TestFunction', SymbolKind.Function, 25, 35, []]
 ];
-check('test.ts', 100, symbols, [
+check('test.ts', 100, symbols, [], [
   [1, 20],
   [5, 10],
   [25, 35],
@@ -152,13 +153,13 @@ check('test.ts', 100, symbols, [
 
 		it('should extract filename correctly from path', async () => {
 			// Arrange
-			const editorWithComplexPath = {
+			setActiveTextEditor({
 				document: {
 					fileName: '/very/long/path/to/my-component.tsx',
 					lineCount: 150,
 				} as TextEditor['document'],
-			};
-			setActiveTextEditor(editorWithComplexPath);
+				selections: [],
+			});
 			(Engine.getSymbols as jest.Mock).mockResolvedValue(mockSymbols);
 			(Engine.alertInfo as jest.Mock) = jest.fn();
 
@@ -172,13 +173,13 @@ check('test.ts', 100, symbols, [
 
 		it('should handle filename edge cases', async () => {
 			// Arrange
-			const editorWithoutExtension = {
+			setActiveTextEditor({
 				document: {
 					fileName: '',
 					lineCount: 50,
 				} as TextEditor['document'],
-			};
-			setActiveTextEditor(editorWithoutExtension);
+				selections: [],
+			});
 			(Engine.getSymbols as jest.Mock).mockResolvedValue(mockSymbols);
 			(Engine.alertInfo as jest.Mock) = jest.fn();
 

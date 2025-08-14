@@ -1,3 +1,10 @@
+class Position {
+	constructor(line, character) {
+		this.line = line;
+		this.character = character;
+	}
+}
+
 // Mock VS Code API for testing
 const vscode = {
 	commands: {
@@ -30,16 +37,16 @@ const vscode = {
 		Imports: 2,
 		Region: 3,
 	},
-	Position: class Position {
-		constructor(line, character) {
-			this.line = line;
-			this.character = character;
-		}
-	},
+	Position: Position,
 	Range: class Range {
-		constructor(start, end) {
-			this.start = start;
-			this.end = end;
+		constructor(start, p2, p3, p4) {
+			if (p3 === undefined && p4 === undefined) {
+				this.start = start;
+				this.end = p2;
+			} else {
+				this.start = new Position(start, p2);
+				this.end = new Position(p3, p4);
+			}
 		}
 	},
 	SymbolKind: {
