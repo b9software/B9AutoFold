@@ -112,8 +112,8 @@ function buildSymbolDepthInfo(symbols: DocumentSymbol[], depth = 0, parent?: Sym
 
 		result.push(symbolWithDepth);
 
-		// Recursively process child symbols
-		if (symbol.children && symbol.children.length > 0) {
+		// Recurse into children if we haven't reached depth 2 yet
+		if (depth < 2 && symbol.children?.length) {
 			result.push(...buildSymbolDepthInfo(symbol.children, depth + 1, symbolWithDepth));
 		}
 	}

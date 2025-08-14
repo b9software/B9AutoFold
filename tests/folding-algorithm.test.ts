@@ -53,6 +53,20 @@ describe('Folding Algorithm Tests', () => {
 		check('test.ts', 30, symbols, [], []);
 	});
 
+	it('should fold nested symbols up to depth 2', () => {
+		const symbols: UTSymbol[] = [
+			// biome-ignore format: skip
+			['L1', SymbolKind.Function, 1, 80, [
+				['L2', SymbolKind.Function, 2, 79, [
+					['L3', SymbolKind.Function, 3, 78, [
+						['L4', SymbolKind.Function, 4, 77, []]
+					]],
+				]],
+			]],
+		];
+		check('nested.ts', 80, symbols, [], [[3, 78]]);
+	});
+
 	it('should fold methods in a class when file is large', () => {
 		const symbols: UTSymbol[] = [
 			[
