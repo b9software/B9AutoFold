@@ -66,6 +66,7 @@
 		"check": "biome check --write --unsafe && pnpm compile && jest",
 		"compile": "tsc --noEmit && node esbuild.js",
 		"package": "vsce package",
+		"publish": "vsce publish",
 		"test": "jest",
 		"vscode:prepublish": "rm -rf dist && node esbuild.js --production",
 		"watch": "node esbuild.js --watch"
