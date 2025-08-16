@@ -6,4 +6,4 @@ B9AutoFold 是一款开箱即用的 VS Code 扩展，能够在打开文件时智
 
 ## 意见反馈
 
-折叠效果不理想？执行「B9AutoFold: Export Symbols for Debugging」命令，将拷贝的内容和你的期望反馈给我。
+折叠效果不理想？执行「B9AutoFold: Export Symbols for Debugging」命令，将拷贝的内容和你的期望[反馈给我](https://github.com/b9software/B9AutoFold/issues/new)。

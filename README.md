@@ -6,4 +6,4 @@ It works out-of-the-box with zero configuration. Leveraging the editor's symbol 
 
 ## Feedback
 
-Experiencing unexpected folding? Use the "B9AutoFold: Export Symbols for Debugging" command, share the copied output, and let me know your expectations.
+Experiencing unexpected folding? Use the "B9AutoFold: Export Symbols for Debugging" command, share the copied output, and [let me know your expectations](https://github.com/b9software/B9AutoFold/issues/new).

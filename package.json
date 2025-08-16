@@ -18,6 +18,11 @@
 				"category": "B9AutoFold",
 				"command": "B9AutoFold.debugSymbols",
 				"title": "Export Symbols for Debugging"
+			},
+			{
+				"category": "B9AutoFold",
+				"command": "B9AutoFold.refold",
+				"title": "Refold Current File"
 			}
 		]
 	},
@@ -51,6 +56,7 @@
 	"license": "MIT",
 	"main": "./dist/extension.js",
 	"name": "vsx-fold",
+	"private": true,
 	"publisher": "b9software",
 	"repository": {
 		"type": "git",
@@ -64,5 +70,5 @@
 		"vscode:prepublish": "rm -rf dist && node esbuild.js --production",
 		"watch": "node esbuild.js --watch"
 	},
-	"version": "0.2.0"
+	"version": "0.3.0"
 }

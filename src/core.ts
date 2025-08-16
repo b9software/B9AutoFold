@@ -1,18 +1,25 @@
-import { commands, type DocumentSymbol, env, SymbolKind, type TextEditor, window } from 'vscode';
+import { type DocumentSymbol, env, SymbolKind, type TextEditor, window } from 'vscode';
 import { TARGET_LINE } from './config';
 import { Engine } from './editor-engine';
 import { generateFoldingPlan } from './folding-algorithm';
-import { delay, logDebug, logError, logInfo } from './utils';
+import { delay, logDebug, logInfo } from './utils';
 
-export async function processAutoFold(editor: TextEditor, isEnd: () => boolean): Promise<void> {
+export async function processAutoFold(
+	editor: TextEditor,
+	options: {
+		isEnd: () => boolean;
+	},
+): Promise<void> {
+	const { isEnd } = options;
 	const totalLines = editor.document.lineCount;
 	if (totalLines < TARGET_LINE) {
 		logDebug('Skip short file');
 		return;
 	}
 
-	// Check if task is cancelled before each await
-	if (isEnd()) return;
+	if (isEnd())
+		// Check if task is cancelled before each await
+		return;
 	let symbols = await Engine.getSymbols(editor);
 
 	if (!symbols) {
@@ -42,15 +49,16 @@ export async function processAutoFold(editor: TextEditor, isEnd: () => boolean):
 		symbols = await Engine.getSymbols(editor);
 	}
 
-	// Wait for symbols to be available before checking ranges
 	if (editor.visibleRanges.length > 1) {
+		// Wait for symbols to be available before checking ranges
 		logDebug('Skip folded file');
 		return;
 	}
 
 	if (!symbols || !symbols.length) {
 		if (isEnd()) return;
-		await foldFallback();
+		logInfo('Fallback: no symbols');
+		await Engine.foldLevel2();
 		return;
 	}
 
@@ -60,7 +68,8 @@ export async function processAutoFold(editor: TextEditor, isEnd: () => boolean):
 	}
 
 	if (isEnd()) return;
-	await foldFallback();
+	logInfo('Fallback: symbols folding failure');
+	await Engine.foldLevel2();
 }
 
 export async function copyDebugSymbols() {
@@ -110,6 +119,26 @@ check('${fileName}', ${lineCount}, symbols, [${skips}], [${foldRangesStr}]);
 	}
 }
 
+/**
+ * Refold the current active editor
+ */
+export async function refoldCurrentFile() {
+	const editor = window.activeTextEditor;
+	if (!editor) {
+		Engine.alertWarning('No active editor found');
+		return;
+	}
+
+	try {
+		await Engine.unfoldAll();
+		await processAutoFold(editor, {
+			isEnd: () => editor !== window.activeTextEditor,
+		});
+	} catch (error) {
+		Engine.alertError('Refold failed: ', error);
+	}
+}
+
 async function foldBySymbols(editor: TextEditor, symbols: DocumentSymbol[]): Promise<boolean> {
 	const foldingRanges = generateFoldingPlan({
 		fileName: editor.document.fileName,
@@ -127,16 +156,6 @@ async function foldBySymbols(editor: TextEditor, symbols: DocumentSymbol[]): Pro
 	await Engine.foldRanges(foldingRanges);
 	logDebug(`Completed folding ${foldingRanges.length} ranges`);
 	return true;
-}
-
-/** @throws NEVER */
-async function foldFallback() {
-	try {
-		logInfo('Fold using fallback method');
-		await commands.executeCommand('editor.foldLevel2');
-	} catch (error) {
-		logError('Execute editor.foldLevel2', error);
-	}
 }
 
 function documentSymbolToString(symbols: DocumentSymbol[], indent = 1): string {

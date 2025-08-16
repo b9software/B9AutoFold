@@ -98,7 +98,9 @@ class Task {
 	async run() {
 		const editor = this.editor;
 		logDebug(`Running ${this}...`);
-		await processAutoFold(editor, () => this.cancelled);
+		await processAutoFold(editor, {
+			isEnd: () => this.cancelled,
+		});
 		logInfo(`${this} completed`);
 	}
 }

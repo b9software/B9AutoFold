@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { copyDebugSymbols } from './core';
+import { copyDebugSymbols, refoldCurrentFile } from './core';
 import { Engine } from './editor-engine';
 import { TaskManager } from './task';
 import { logInfo } from './utils';
@@ -8,6 +8,8 @@ export function activate(context: vscode.ExtensionContext) {
 	logInfo('Auto Fold extension is activating...');
 
 	const debugSymbolsCommand = vscode.commands.registerCommand('B9AutoFold.debugSymbols', copyDebugSymbols);
+
+	const refoldCommand = vscode.commands.registerCommand('B9AutoFold.refold', refoldCurrentFile);
 
 	const onDidOpenTextDocument = vscode.workspace.onDidOpenTextDocument(async () => {
 		TaskManager.shared.setActiveEditorMayChanged();
@@ -23,6 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		debugSymbolsCommand,
+		refoldCommand,
 		onDidOpenTextDocument,
 		onDidChangeActiveTextEditor,
 		onDidCloseTextDocument,

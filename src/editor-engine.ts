@@ -18,24 +18,29 @@ export class Engine {
 	 * @throws NEVER
 	 */
 	static async getSymbols(editor: TextEditor): Promise<DocumentSymbol[] | undefined> {
-		try {
-			return await commands.executeCommand<DocumentSymbol[]>(
-				'vscode.executeDocumentSymbolProvider',
-				editor.document.uri,
-			);
-		} catch (error) {
-			logError('Get DocumentSymbol:', error);
-			return undefined;
-		}
+		return Engine.shared.executeCommand('vscode.executeDocumentSymbolProvider', editor.document.uri);
 	}
 
 	static async foldRanges(ranges: FoldingRange[]): Promise<void> {
+		Engine.shared.executeCommand('editor.fold', {
+			selectionLines: ranges.map((range) => range.start),
+		});
+	}
+
+	static async unfoldAll(): Promise<void> {
+		await Engine.shared.executeCommand('editor.unfoldAll');
+	}
+
+	static async foldLevel2(): Promise<void> {
+		await Engine.shared.executeCommand('editor.foldLevel2');
+	}
+
+	private async executeCommand<T>(command: string, ...args: unknown[]): Promise<T | undefined> {
 		try {
-			await commands.executeCommand('editor.fold', {
-				selectionLines: ranges.map((range) => range.start),
-			});
+			return await commands.executeCommand<T>(command, ...args);
 		} catch (error) {
-			logError('Execute editor.fold:', error);
+			logError(`Execute ${command}:`, error);
+			return undefined;
 		}
 	}
 
