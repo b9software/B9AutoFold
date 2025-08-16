@@ -29,3 +29,22 @@ jobs:
       
     - name: Run checks
       run: pnpm check
+    
+    - name: Package extension
+      run: pnpm package
+
+    - name: Get package info
+      id: package
+      run: |
+        echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        echo "name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: Release ${{ github.ref_name }}
+        files: ./${{ steps.package.outputs.name }}-${{ steps.package.outputs.version }}.vsix
+        draft: true
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
