@@ -1,6 +1,6 @@
 import { DocumentSymbol, env, Position, Range, SymbolKind, type TextEditor, window } from 'vscode';
 import { copyDebugSymbols } from '../src/core';
-import { Engine } from '../src/editor-engine';
+import * as Engine from '../src/editor-engine';
 
 // Mock Engine module
 jest.mock('../src/editor-engine');
@@ -69,7 +69,6 @@ describe('Command Tests', () => {
 			// Arrange
 			setActiveTextEditor(mockEditor);
 			(Engine.getSymbols as jest.Mock).mockResolvedValue(mockSymbols);
-			(Engine.alertInfo as jest.Mock) = jest.fn();
 
 			// Act
 			await copyDebugSymbols();
@@ -95,7 +94,6 @@ check('test.ts', 100, symbols, [], [
 		it('should show warning when no active editor', async () => {
 			// Arrange
 			setActiveTextEditor(null);
-			(Engine.alertWarning as jest.Mock) = jest.fn();
 
 			// Act
 			await copyDebugSymbols();
@@ -110,7 +108,6 @@ check('test.ts', 100, symbols, [], [
 			// Arrange
 			setActiveTextEditor(mockEditor);
 			(Engine.getSymbols as jest.Mock).mockResolvedValue([]);
-			(Engine.alertInfo as jest.Mock) = jest.fn();
 
 			// Act
 			await copyDebugSymbols();
@@ -125,7 +122,6 @@ check('test.ts', 100, symbols, [], [
 			// Arrange
 			setActiveTextEditor(mockEditor);
 			(Engine.getSymbols as jest.Mock).mockResolvedValue(null);
-			(Engine.alertInfo as jest.Mock) = jest.fn();
 
 			// Act
 			await copyDebugSymbols();
@@ -141,7 +137,6 @@ check('test.ts', 100, symbols, [], [
 			setActiveTextEditor(mockEditor);
 			const error = new Error('Test error');
 			(Engine.getSymbols as jest.Mock).mockRejectedValue(error);
-			(Engine.alertError as jest.Mock) = jest.fn();
 
 			// Act
 			await copyDebugSymbols();
@@ -161,7 +156,6 @@ check('test.ts', 100, symbols, [], [
 				selections: [],
 			});
 			(Engine.getSymbols as jest.Mock).mockResolvedValue(mockSymbols);
-			(Engine.alertInfo as jest.Mock) = jest.fn();
 
 			// Act
 			await copyDebugSymbols();
@@ -181,7 +175,6 @@ check('test.ts', 100, symbols, [], [
 				selections: [],
 			});
 			(Engine.getSymbols as jest.Mock).mockResolvedValue(mockSymbols);
-			(Engine.alertInfo as jest.Mock) = jest.fn();
 
 			// Act
 			await copyDebugSymbols();
