@@ -1,25 +1,26 @@
-import * as vscode from 'vscode';
+import { APP_NAME } from './config';
 import { copyDebugSymbols, refoldCurrentFile } from './core';
-import { Engine } from './editor-engine';
+import { releaseOutputChannel } from './editor-engine';
 import { TaskManager } from './task';
 import { logInfo } from './utils';
+import { commands, type ExtensionContext, window, workspace } from './vscode';
 
-export function activate(context: vscode.ExtensionContext) {
-	logInfo('Auto Fold extension is activating...');
+export function activate(context: ExtensionContext) {
+	logInfo(`${APP_NAME} is activating...`);
 
-	const debugSymbolsCommand = vscode.commands.registerCommand('B9AutoFold.debugSymbols', copyDebugSymbols);
+	const debugSymbolsCommand = commands.registerCommand('B9AutoFold.debugSymbols', copyDebugSymbols);
 
-	const refoldCommand = vscode.commands.registerCommand('B9AutoFold.refold', refoldCurrentFile);
+	const refoldCommand = commands.registerCommand('B9AutoFold.refold', refoldCurrentFile);
 
-	const onDidOpenTextDocument = vscode.workspace.onDidOpenTextDocument(async () => {
+	const onDidOpenTextDocument = workspace.onDidOpenTextDocument(async () => {
 		TaskManager.shared.setActiveEditorMayChanged();
 	});
 
-	const onDidChangeActiveTextEditor = vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+	const onDidChangeActiveTextEditor = window.onDidChangeActiveTextEditor(async (editor) => {
 		TaskManager.shared.setActiveEditor(editor);
 	});
 
-	const onDidCloseTextDocument = vscode.workspace.onDidCloseTextDocument((document) => {
+	const onDidCloseTextDocument = workspace.onDidCloseTextDocument((document) => {
 		TaskManager.shared.removeProcessedFile(document.uri.toString());
 	});
 
@@ -34,6 +35,6 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-	logInfo('Auto Fold extension is deactivating...');
-	Engine.shared.deactivate();
+	logInfo(`${APP_NAME} is deactivating...`);
+	releaseOutputChannel();
 }

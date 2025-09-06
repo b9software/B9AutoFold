@@ -1,8 +1,18 @@
-import { type DocumentSymbol, env, SymbolKind, type TextEditor, window } from 'vscode';
 import { TARGET_LINE } from './config';
-import { Engine } from './editor-engine';
+import {
+	alertError,
+	alertInfo,
+	alertWarning,
+	foldLevel2,
+	foldRanges,
+	getCurrentEditor,
+	getSymbols,
+	outputLine,
+	unfoldAll,
+} from './editor-engine';
 import { generateFoldingPlan } from './folding-algorithm';
-import { delay, logDebug, logInfo } from './utils';
+import { debugDescription, debugTextEditor, delay, logDebug, logInfo } from './utils';
+import { type DocumentSymbol, env, SymbolKind, type TextEditor, window } from './vscode';
 
 export async function processAutoFold(
 	editor: TextEditor,
@@ -20,7 +30,7 @@ export async function processAutoFold(
 	if (isEnd())
 		// Check if task is cancelled before each await
 		return;
-	let symbols = await Engine.getSymbols(editor);
+	let symbols = await getSymbols(editor);
 
 	if (!symbols) {
 		if (isEnd()) return;
@@ -28,7 +38,7 @@ export async function processAutoFold(
 
 		if (isEnd()) return;
 		logDebug('First retry to get symbols');
-		symbols = await Engine.getSymbols(editor);
+		symbols = await getSymbols(editor);
 	}
 
 	if (!symbols) {
@@ -37,7 +47,7 @@ export async function processAutoFold(
 
 		if (isEnd()) return;
 		logDebug('Second retry to get symbols');
-		symbols = await Engine.getSymbols(editor);
+		symbols = await getSymbols(editor);
 	}
 
 	if (!symbols) {
@@ -46,10 +56,15 @@ export async function processAutoFold(
 
 		if (isEnd()) return;
 		logDebug('Third retry to get symbols');
-		symbols = await Engine.getSymbols(editor);
+		symbols = await getSymbols(editor);
 	}
 
-	if (editor.visibleRanges.length > 1) {
+	const activeEditor = getCurrentEditor(editor);
+	if (!activeEditor) {
+		logDebug('Editor changed, abort folding');
+		return;
+	}
+	if (activeEditor.visibleRanges.length > 1) {
 		// Wait for symbols to be available before checking ranges
 		logDebug('Skip folded file');
 		return;
@@ -58,31 +73,31 @@ export async function processAutoFold(
 	if (!symbols || !symbols.length) {
 		if (isEnd()) return;
 		logInfo('Fallback: no symbols');
-		await Engine.foldLevel2();
+		await foldLevel2();
 		return;
 	}
 
 	if (isEnd()) return;
-	if (await foldBySymbols(editor, symbols)) {
+	if (await foldBySymbols(activeEditor, symbols)) {
 		return;
 	}
 
 	if (isEnd()) return;
 	logInfo('Fallback: symbols folding failure');
-	await Engine.foldLevel2();
+	await foldLevel2();
 }
 
 export async function copyDebugSymbols() {
 	const editor = window.activeTextEditor;
 	if (!editor) {
-		Engine.alertWarning('No active editor found');
+		alertWarning('No active editor found');
 		return;
 	}
 
 	try {
-		const symbols = await Engine.getSymbols(editor);
+		const symbols = await getSymbols(editor);
 		if (!symbols || symbols.length === 0) {
-			Engine.alertInfo('No symbols found in current document');
+			alertInfo('No symbols found in current document');
 			return;
 		}
 
@@ -113,9 +128,9 @@ check('${fileName}', ${lineCount}, symbols, [${skips}], [${foldRangesStr}]);
 `;
 
 		await env.clipboard.writeText(output);
-		Engine.alertInfo('Symbols exported to clipboard');
+		alertInfo('Symbols exported to clipboard');
 	} catch (error) {
-		Engine.alertError('Failed to export symbols: ', error);
+		alertError('Failed to export symbols: ', error);
 	}
 }
 
@@ -125,21 +140,23 @@ check('${fileName}', ${lineCount}, symbols, [${skips}], [${foldRangesStr}]);
 export async function refoldCurrentFile() {
 	const editor = window.activeTextEditor;
 	if (!editor) {
-		Engine.alertWarning('No active editor found');
+		alertWarning('No active editor found');
 		return;
 	}
+	DEBUG && outputLine(`>>>> ${debugTextEditor(editor)}`);
 
 	try {
-		await Engine.unfoldAll();
+		await unfoldAll();
 		await processAutoFold(editor, {
 			isEnd: () => editor !== window.activeTextEditor,
 		});
 	} catch (error) {
-		Engine.alertError('Refold failed: ', error);
+		alertError('Refold failed: ', error);
 	}
 }
 
 async function foldBySymbols(editor: TextEditor, symbols: DocumentSymbol[]): Promise<boolean> {
+	DEBUG && outputLine(`>>>> foldBySymbols enter: ${debugTextEditor(editor)}`);
 	const foldingRanges = generateFoldingPlan({
 		fileName: editor.document.fileName,
 		foldedRanges: [],
@@ -153,8 +170,11 @@ async function foldBySymbols(editor: TextEditor, symbols: DocumentSymbol[]): Pro
 		logDebug('No folding ranges generated');
 		return false;
 	}
-	await Engine.foldRanges(foldingRanges);
+	DEBUG &&
+		outputLine(`>>>> foldBySymbols will fold: ${debugDescription(foldingRanges[0])}, ... (${foldingRanges.length})`);
+	await foldRanges(editor, foldingRanges);
 	logDebug(`Completed folding ${foldingRanges.length} ranges`);
+	DEBUG && outputLine(`>>>> foldBySymbols exit: ${debugTextEditor(editor)}`);
 	return true;
 }
 

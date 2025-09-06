@@ -33,6 +33,8 @@ async function main() {
 		external: ['vscode'],
 		format: 'cjs',
 		logLevel: 'warning',
+		mangleProps: production ? /^_/ : undefined,
+		mangleQuoted: production ? true : undefined,
 		minify: production,
 		outfile: 'dist/extension.js',
 		platform: 'node',

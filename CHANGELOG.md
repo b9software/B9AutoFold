@@ -2,6 +2,10 @@
 
 <!-- https://keepachangelog.com -->
 
+## [0.4.0] - 2025-09-06
+
+- Improve folding behavior
+
 ## [0.3.0] - 2025-08-16
 
 - Add command to reapply folding

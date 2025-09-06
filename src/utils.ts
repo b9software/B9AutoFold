@@ -1,7 +1,7 @@
 import * as path from 'node:path';
 import { inspect } from 'node:util';
-import { FoldingRange, Range, Selection, type Uri } from 'vscode';
-import { Engine } from './editor-engine';
+import { outputLine } from './editor-engine';
+import { FoldingRange, Range, Selection, type TextEditor, type Uri } from './vscode';
 
 export async function delay(ms: number): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ms));
@@ -20,26 +20,26 @@ export function logDebug(message: string, ...args: unknown[]) {
 	if (DEBUG) {
 		const logMessage = `${timestamp()}🔵 ${message}`;
 		console.info(logMessage, ...args);
-		Engine.outputLine(logMessage, ...args);
+		outputLine(logMessage, ...args);
 	}
 }
 
 export function logInfo(message: string, ...args: unknown[]) {
 	const logMessage = `${timestamp()}${message}`;
 	console.info(logMessage, ...args);
-	Engine.outputLine(logMessage, ...args);
+	outputLine(logMessage, ...args);
 }
 
 export function logWarn(message: string, ...args: unknown[]) {
 	const logMessage = `${timestamp()}🟡 ${message}`;
 	console.warn(logMessage, ...args);
-	Engine.outputLine(logMessage, ...args);
+	outputLine(logMessage, ...args);
 }
 
 export function logError(title: string, error: unknown) {
 	const logMessage = `${timestamp()}🔴 ${title}`;
 	console.error(logMessage, error);
-	Engine.outputLine(logMessage, error);
+	outputLine(logMessage, error);
 }
 
 function timestamp() {
@@ -67,4 +67,12 @@ export function debugDescription(value: FoldingRange | Range | Selection): strin
 		}
 	}
 	return '';
+}
+
+export function debugTextEditor(editor: TextEditor): string {
+	return `<TextEditor: ${editor.document.fileName}
+  selection: ${debugDescription(editor.selection)}
+  visibleRanges: [${editor.visibleRanges.map(debugDescription).join(', ')}]
+  lineCount: ${editor.document.lineCount}
+>`;
 }
