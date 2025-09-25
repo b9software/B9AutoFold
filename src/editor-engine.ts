@@ -1,5 +1,5 @@
 import { APP_NAME } from './config';
-import { logError } from './utils';
+import { debugDescription, logDebug, logError, logInfo } from './utils';
 import {
 	commands,
 	createOutputChannel,
@@ -106,6 +106,7 @@ export async function foldRanges(editor: TextEditor, planned: FoldingRange[]): P
 		// Fallback to previous behavior with bottom-up order
 		selectionLines = Array.from(new Set(planned.map((r) => r.start))).sort((a, b) => b - a);
 	}
+	logInfo(`Fold Lines: ${selectionLines.join(', ')}`);
 	await executeCommand('editor.fold', { selectionLines });
 }
 

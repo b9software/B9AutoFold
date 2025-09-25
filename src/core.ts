@@ -170,8 +170,7 @@ async function foldBySymbols(editor: TextEditor, symbols: DocumentSymbol[]): Pro
 		logDebug('No folding ranges generated');
 		return false;
 	}
-	DEBUG &&
-		outputLine(`>>>> foldBySymbols will fold: ${debugDescription(foldingRanges[0])}, ... (${foldingRanges.length})`);
+	await unfoldAll();
 	await foldRanges(editor, foldingRanges);
 	logDebug(`Completed folding ${foldingRanges.length} ranges`);
 	DEBUG && outputLine(`>>>> foldBySymbols exit: ${debugTextEditor(editor)}`);

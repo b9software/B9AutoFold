@@ -91,10 +91,11 @@ export function generateFoldingPlan(context: FoldingContext): FoldingRange[] {
 		}
 	}
 
+	foldingPlan.sort((a, b) => a.start - b.start);
 	logDebug(
 		`Generated ${foldingPlan.map(debugDescription)} folding ranges, estimated visible lines: ${context.visibleLines}`,
 	);
-	return foldingPlan.sort((a, b) => a.start - b.start);
+	return foldingPlan;
 }
 
 /**

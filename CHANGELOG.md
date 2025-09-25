@@ -2,6 +2,10 @@
 
 <!-- https://keepachangelog.com -->
 
+## [0.5.0] - 2025-09-25
+
+- Fix excessive folding bug.
+
 ## [0.4.0] - 2025-09-06
 
 - Improve folding behavior
