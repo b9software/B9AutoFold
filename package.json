@@ -35,6 +35,7 @@
 		"@vscode/vsce": "latest",
 		"esbuild": "latest",
 		"jest": "latest",
+		"ovsx": "latest",
 		"ts-jest": "latest",
 		"typescript": "latest"
 	},

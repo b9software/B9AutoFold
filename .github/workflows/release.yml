@@ -55,7 +55,7 @@ jobs:
       env:
         VSCE_PAT: ${{ secrets.VSCE_PAT }}
         
-    # - name: Publish to Open VSX Registry
-    #   run: npx ovsx publish ./${{ steps.package.outputs.name }}-${{ steps.package.outputs.version }}.vsix
-    #   env:
-    #     OVSX_PAT: ${{ secrets.OVSX_PAT }}
+    - name: Publish to Open VSX Registry
+      run: pnpm ovsx publish ./${{ steps.package.outputs.name }}-${{ steps.package.outputs.version }}.vsix
+      env:
+        OVSX_PAT: ${{ secrets.OVSX_PAT }}
