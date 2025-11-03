@@ -31,7 +31,7 @@
 		"@biomejs/biome": "latest",
 		"@types/jest": "latest",
 		"@types/node": "~24.10.0",
-		"@types/vscode": "latest",
+		"@types/vscode": "^1.90.0",
 		"@vscode/vsce": "latest",
 		"esbuild": "latest",
 		"jest": "latest",
