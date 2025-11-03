@@ -30,8 +30,8 @@
 	"devDependencies": {
 		"@biomejs/biome": "latest",
 		"@types/jest": "latest",
-		"@types/node": "22.x",
-		"@types/vscode": "1.90.0",
+		"@types/node": "~24.10.0",
+		"@types/vscode": "latest",
 		"@vscode/vsce": "latest",
 		"esbuild": "latest",
 		"jest": "latest",
