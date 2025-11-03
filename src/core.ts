@@ -78,6 +78,9 @@ export async function processAutoFold(
 	}
 
 	if (isEnd()) return;
+	await delay(300);
+	if (isEnd()) return;
+
 	if (await foldBySymbols(activeEditor, symbols)) {
 		return;
 	}

@@ -2,6 +2,10 @@
 
 <!-- https://keepachangelog.com -->
 
+## [0.6.0] - 2025-11-03
+
+- Optimize folding behavior after symbol navigation
+
 ## [0.5.0] - 2025-09-25
 
 - Fix excessive folding bug.

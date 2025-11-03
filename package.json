@@ -72,5 +72,5 @@
 		"vscode:prepublish": "rm -rf dist && node esbuild.js --production",
 		"watch": "node esbuild.js --watch"
 	},
-	"version": "0.5.0"
+	"version": "0.6.0"
 }
