@@ -1,4 +1,4 @@
-import { TARGET_LINE } from './config';
+import { getUncommittedChangesConfig, TARGET_LINE } from './config';
 import {
 	alertError,
 	alertInfo,
@@ -11,8 +11,9 @@ import {
 	unfoldAll,
 } from './editor-engine';
 import { generateFoldingPlan } from './folding-algorithm';
-import { debugDescription, debugTextEditor, delay, logDebug, logInfo } from './utils';
-import { type DocumentSymbol, env, SymbolKind, type TextEditor, window } from './vscode';
+import { getUncommittedChanges } from './git-utils';
+import { debugTextEditor, delay, logDebug, logInfo } from './utils';
+import { type DocumentSymbol, env, Range, SymbolKind, type TextEditor, window } from './vscode';
 
 export async function processAutoFold(
 	editor: TextEditor,
@@ -160,10 +161,11 @@ export async function refoldCurrentFile() {
 
 async function foldBySymbols(editor: TextEditor, symbols: DocumentSymbol[]): Promise<boolean> {
 	DEBUG && outputLine(`>>>> foldBySymbols enter: ${debugTextEditor(editor)}`);
+	const skipRanges = await getSkipRanges(editor);
 	const foldingRanges = generateFoldingPlan({
 		fileName: editor.document.fileName,
 		foldedRanges: [],
-		skipRanges: editor.selections,
+		skipRanges: skipRanges,
 		symbols: symbols,
 		targetLines: TARGET_LINE,
 		topLevelContainer: symbols.length,
@@ -197,4 +199,26 @@ function documentSymbolToString(symbols: DocumentSymbol[], indent = 1): string {
 		return result;
 	});
 	return items.join(',\n') + (indent === 1 ? '' : '\n');
+}
+
+async function getSkipRanges(editor: TextEditor): Promise<Range[]> {
+	const { enable, contextLines } = getUncommittedChangesConfig();
+	const skipRanges: Range[] = [...editor.selections];
+
+	if (enable) {
+		try {
+			const changes = await getUncommittedChanges(editor.document.fileName);
+			if (changes.length > 0) {
+				const expandedChanges = changes.map((range) => {
+					const start = Math.max(0, range.start.line - contextLines);
+					const end = Math.min(editor.document.lineCount - 1, range.end.line + contextLines);
+					return new Range(start, 0, end, 0);
+				});
+				skipRanges.push(...expandedChanges);
+			}
+		} catch (e) {
+			logDebug('Failed to get uncommitted changes', e);
+		}
+	}
+	return skipRanges;
 }

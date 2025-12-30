@@ -1,5 +1,5 @@
 import { APP_NAME } from './config';
-import { debugDescription, logDebug, logError, logInfo } from './utils';
+import { logError, logInfo } from './utils';
 import {
 	commands,
 	createOutputChannel,

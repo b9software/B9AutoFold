@@ -24,7 +24,22 @@
 				"command": "B9AutoFold.refold",
 				"title": "Refold Current File"
 			}
-		]
+		],
+		"configuration": {
+			"properties": {
+				"B9AutoFold.uncommittedChanges.contextLines": {
+					"default": 3,
+					"description": "Number of lines around uncommitted changes to keep unfolded.",
+					"type": "number"
+				},
+				"B9AutoFold.uncommittedChanges.enable": {
+					"default": true,
+					"description": "Do not fold lines with uncommitted changes.",
+					"type": "boolean"
+				}
+			},
+			"title": "B9AutoFold"
+		}
 	},
 	"description": "Automatically fold code when opening files",
 	"devDependencies": {
@@ -45,14 +60,16 @@
 	},
 	"icon": "icon.png",
 	"keywords": [
-		"auto fold",
+		"ai review",
+		"auto smart fold",
 		"code folding",
+		"code review",
 		"editor",
 		"fold regions",
 		"folding",
-		"region",
-		"smart fold",
-		"折叠"
+		"vibe coding",
+		"折叠",
+		"代码检视"
 	],
 	"license": "MIT",
 	"main": "./dist/extension.js",
@@ -72,5 +89,5 @@
 		"vscode:prepublish": "rm -rf dist && node esbuild.js --production",
 		"watch": "node esbuild.js --watch"
 	},
-	"version": "0.6.0"
+	"version": "0.7.0"
 }

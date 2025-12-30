@@ -1,6 +1,6 @@
 # B9AutoFold
 
-A lightweight VS Code extension that automatically folds code when you open a file, so the main structure fits on one screen (~40 lines). Zero configuration, reliable behavior.
+A lightweight VS Code extension that automatically folds code when you open a file, so the main structure fits on one screen (~40 lines). Originally designed to boost efficiency for handwritten code, it is now also a powerful assistant for reviewing code in Vibe Coding.
 
 English | [中文说明](./README.zh-CN.md)
 
@@ -13,6 +13,7 @@ English | [中文说明](./README.zh-CN.md)
 ## Features
 
 - Out-of-the-box: no settings required
+- Great Helper for Reviewing AI-Generated Code: Automatically keeps uncommitted changes (git diff) unfolded. When AI agents modify your code, you see exactly what changed while the rest remains folded—perfect for efficient reviews.
 - Uses the editor's Document Symbols (Outline) to plan folding for any language that provides them
 - Fallback to "Fold Level 2" when symbols are not available
 - Respects your current selection: selected regions are avoided during folding
@@ -23,6 +24,13 @@ English | [中文说明](./README.zh-CN.md)
 
 - B9AutoFold: Refold Current File – Unfolds everything, then reapplies the folding plan for the current editor
 - B9AutoFold: Export Symbols for Debugging – Copies symbol info and the computed folding plan to the clipboard to help investigate unexpected folding
+
+## Configuration
+
+B9AutoFold works out-of-the-box, but you can customize the uncommitted changes behavior:
+
+- `B9AutoFold.uncommittedChanges.enable`: Enable/disable "do not fold uncommitted changes" (default: `true`).
+- `B9AutoFold.uncommittedChanges.contextLines`: Number of context lines to keep unfolded around uncommitted changes (default: `3`).
 
 ## How It Works
 

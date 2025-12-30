@@ -2,6 +2,11 @@
 
 <!-- https://keepachangelog.com -->
 
+## [0.7.0] - 2025-12-30
+
+- New: Do not fold lines with uncommitted changes (requires Git).
+- New: Added configuration to control uncommitted changes folding behavior.
+
 ## [0.6.0] - 2025-11-03
 
 - Optimize folding behavior after symbol navigation
