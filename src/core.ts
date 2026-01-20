@@ -1,4 +1,5 @@
 import { getUncommittedChangesConfig, TARGET_LINE } from './config';
+import { getDiagnosticRanges } from './diagnostic-utils';
 import {
 	alertError,
 	alertInfo,
@@ -220,5 +221,16 @@ async function getSkipRanges(editor: TextEditor): Promise<Range[]> {
 			logDebug('Failed to get uncommitted changes', e);
 		}
 	}
+
+	// Handle diagnostic problems - always enabled, no context lines
+	try {
+		const diagnosticRanges = getDiagnosticRanges(editor);
+		if (diagnosticRanges.length > 0) {
+			skipRanges.push(...diagnosticRanges);
+		}
+	} catch (e) {
+		logDebug('Failed to get diagnostic ranges', e);
+	}
+
 	return skipRanges;
 }

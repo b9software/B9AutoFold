@@ -6,6 +6,7 @@ export {
 	ExtensionContext,
 	env,
 	FoldingRange,
+	languages,
 	OutputChannel,
 	Range,
 	Selection,

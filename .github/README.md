@@ -1,5 +1,8 @@
 # B9AutoFold
 
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/b9software.vsx-fold?style=flat-square&color=622D93&label=VS%20Code%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=b9software.vsx-fold)
+[![Open VSX](https://img.shields.io/open-vsx/v/b9software/vsx-fold?style=flat-square&color=622D93&label=Open%20VSX)](https://open-vsx.org/extension/B9Software/vsx-fold)
+
 A VS Code extension that automatically folds code blocks when opening files to display the main structure within one screen (~40 lines), helping users quickly understand code.
 
 The extension intelligently calculates folding ranges based on symbol information provided by the editor, supporting all languages that provide symbol information. When symbol information is unavailable, it defaults to Fold Level 2.

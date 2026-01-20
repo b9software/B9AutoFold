@@ -2,6 +2,10 @@
 
 <!-- https://keepachangelog.com -->
 
+## [0.8.0] - 2026-01-09
+
+- New: Do not fold lines that have diagnostics (errors/warnings).
+
 ## [0.7.0] - 2025-12-30
 
 - New: Do not fold lines with uncommitted changes (requires Git).
