@@ -8,7 +8,7 @@ export function getDiagnosticRanges(editor: TextEditor): Range[] {
 	try {
 		const uri = editor.document.uri;
 		const diagnostics = languages.getDiagnostics(uri);
-		
+
 		if (!diagnostics || diagnostics.length === 0) {
 			return [];
 		}
