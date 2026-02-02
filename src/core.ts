@@ -1,4 +1,4 @@
-import { getUncommittedChangesConfig, TARGET_LINE } from './config';
+import { isUncommittedChangesEnabled, TARGET_LINE } from './config';
 import { getDiagnosticRanges } from './diagnostic-utils';
 import {
 	alertError,
@@ -14,7 +14,7 @@ import {
 import { generateFoldingPlan } from './folding-algorithm';
 import { getUncommittedChanges } from './git-utils';
 import { debugTextEditor, delay, logDebug, logInfo } from './utils';
-import { type DocumentSymbol, env, Range, SymbolKind, type TextEditor, window } from './vscode';
+import { type DocumentSymbol, env, type Range, SymbolKind, type TextEditor, window } from './vscode';
 
 export async function processAutoFold(
 	editor: TextEditor,
@@ -203,19 +203,13 @@ function documentSymbolToString(symbols: DocumentSymbol[], indent = 1): string {
 }
 
 async function getSkipRanges(editor: TextEditor): Promise<Range[]> {
-	const { enable, contextLines } = getUncommittedChangesConfig();
 	const skipRanges: Range[] = [...editor.selections];
 
-	if (enable) {
+	if (isUncommittedChangesEnabled()) {
 		try {
 			const changes = await getUncommittedChanges(editor.document.fileName);
 			if (changes.length > 0) {
-				const expandedChanges = changes.map((range) => {
-					const start = Math.max(0, range.start.line - contextLines);
-					const end = Math.min(editor.document.lineCount - 1, range.end.line + contextLines);
-					return new Range(start, 0, end, 0);
-				});
-				skipRanges.push(...expandedChanges);
+				skipRanges.push(...changes);
 			}
 		} catch (e) {
 			logDebug('Failed to get uncommitted changes', e);

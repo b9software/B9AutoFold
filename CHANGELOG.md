@@ -2,6 +2,10 @@
 
 <!-- https://keepachangelog.com -->
 
+## [0.8.1] - 2026-02-02
+
+- Removed: The `uncommittedChanges.contextLines` configuration option has been removed as it was unnecessary.
+
 ## [0.8.0] - 2026-01-09
 
 - New: Do not fold lines that have diagnostics (errors/warnings).

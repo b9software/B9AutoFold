@@ -30,7 +30,6 @@
 B9AutoFold 开箱即用，但也提供了针对未提交更改行为的配置：
 
 - `B9AutoFold.uncommittedChanges.enable`: 启用/禁用「不折叠未提交更改」（默认：`true`）。
-- `B9AutoFold.uncommittedChanges.contextLines`: 未提交更改周围保留展开的上下文行数（默认：`3`）。
 
 ## 工作原理
 

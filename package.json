@@ -27,11 +27,6 @@
 		],
 		"configuration": {
 			"properties": {
-				"B9AutoFold.uncommittedChanges.contextLines": {
-					"default": 3,
-					"description": "Number of lines around uncommitted changes to keep unfolded.",
-					"type": "number"
-				},
 				"B9AutoFold.uncommittedChanges.enable": {
 					"default": true,
 					"description": "Do not fold lines with uncommitted changes.",

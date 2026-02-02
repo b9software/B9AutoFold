@@ -30,7 +30,6 @@ English | [中文说明](./README.zh-CN.md)
 B9AutoFold works out-of-the-box, but you can customize the uncommitted changes behavior:
 
 - `B9AutoFold.uncommittedChanges.enable`: Enable/disable "do not fold uncommitted changes" (default: `true`).
-- `B9AutoFold.uncommittedChanges.contextLines`: Number of context lines to keep unfolded around uncommitted changes (default: `3`).
 
 ## How It Works
 

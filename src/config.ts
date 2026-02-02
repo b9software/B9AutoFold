@@ -4,10 +4,7 @@ export const TARGET_LINE = 40;
 
 export const APP_NAME = 'B9AutoFold';
 
-export function getUncommittedChangesConfig() {
+export function isUncommittedChangesEnabled(): boolean {
 	const config = getConfiguration(APP_NAME);
-	return {
-		contextLines: config.get<number>('uncommittedChanges.contextLines', 3),
-		enable: config.get<boolean>('uncommittedChanges.enable', true),
-	};
+	return config.get<boolean>('uncommittedChanges.enable', true);
 }
