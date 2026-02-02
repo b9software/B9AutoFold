@@ -17,7 +17,7 @@ describe('git-utils', () => {
 
 	describe('getUncommittedChanges', () => {
 		it('should return empty array if git diff fails (error)', async () => {
-			(child_process.exec as unknown as jest.Mock).mockImplementation((_cmd, _opts, callback) => {
+			(child_process.execFile as unknown as jest.Mock).mockImplementation((_cmd, _args, _opts, callback) => {
 				callback(new Error('git not found'), '', 'error message');
 			});
 
@@ -26,7 +26,7 @@ describe('git-utils', () => {
 		});
 
 		it('should return empty array if git diff returns empty string', async () => {
-			(child_process.exec as unknown as jest.Mock).mockImplementation((_cmd, _opts, callback) => {
+			(child_process.execFile as unknown as jest.Mock).mockImplementation((_cmd, _args, _opts, callback) => {
 				callback(null, '', '');
 			});
 
@@ -41,7 +41,7 @@ describe('git-utils', () => {
 @@ -20,1 +20,3 @@
  code
 `;
-			(child_process.exec as unknown as jest.Mock).mockImplementation((_cmd, _opts, callback) => {
+			(child_process.execFile as unknown as jest.Mock).mockImplementation((_cmd, _args, _opts, callback) => {
 				callback(null, stdout, '');
 			});
 
@@ -58,7 +58,7 @@ describe('git-utils', () => {
 
 		it('should parse git diff output correctly for deletions', async () => {
 			const stdout = `@@ -10,1 +10,0 @@`;
-			(child_process.exec as unknown as jest.Mock).mockImplementation((_cmd, _opts, callback) => {
+			(child_process.execFile as unknown as jest.Mock).mockImplementation((_cmd, _args, _opts, callback) => {
 				callback(null, stdout, '');
 			});
 
@@ -74,7 +74,7 @@ describe('git-utils', () => {
 			// startLine=11, count=1.
 			// Range(10, 10).
 
-			(child_process.exec as unknown as jest.Mock).mockImplementation((_cmd, _opts, callback) => {
+			(child_process.execFile as unknown as jest.Mock).mockImplementation((_cmd, _args, _opts, callback) => {
 				callback(null, stdout, '');
 			});
 

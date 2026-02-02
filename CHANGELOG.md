@@ -5,6 +5,7 @@
 ## [0.8.1] - 2026-02-02
 
 - Removed: The `uncommittedChanges.contextLines` configuration option has been removed as it was unnecessary.
+- Improved: Use safer `execFile` instead of `exec` for git commands to prevent potential shell injection issues.
 
 ## [0.8.0] - 2026-01-09
 

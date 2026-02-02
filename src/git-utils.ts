@@ -1,4 +1,4 @@
-import { exec } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import * as path from 'node:path';
 import { logDebug } from './utils';
 import { Range } from './vscode';
@@ -13,7 +13,7 @@ export async function getUncommittedChanges(fileName: string): Promise<Range[]> 
 	return new Promise((resolve) => {
 		// Use --unified=0 to get minimal context diffs
 		// Use HEAD to compare against the last commit
-		exec(`git diff --unified=0 HEAD -- "${baseName}"`, { cwd: dir }, (error, stdout, stderr) => {
+		execFile('git', ['diff', '--unified=0', 'HEAD', '--', baseName], { cwd: dir }, (error, stdout, stderr) => {
 			if (error) {
 				// git returns 1 if there are differences? No, usually 0.
 				// If error is present, it might be a real error (e.g. not a git repo).
