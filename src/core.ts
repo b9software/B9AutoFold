@@ -34,30 +34,13 @@ export async function processAutoFold(
 		return;
 	let symbols = await getSymbols(editor);
 
-	if (!symbols) {
+	// Retry with increasing delays if symbols not immediately available
+	const retryDelays = [100, 200, 500];
+	for (let i = 0; i < retryDelays.length && !symbols; i++) {
 		if (isEnd()) return;
-		await delay(100);
-
+		await delay(retryDelays[i]);
 		if (isEnd()) return;
-		logDebug('First retry to get symbols');
-		symbols = await getSymbols(editor);
-	}
-
-	if (!symbols) {
-		if (isEnd()) return;
-		await delay(200);
-
-		if (isEnd()) return;
-		logDebug('Second retry to get symbols');
-		symbols = await getSymbols(editor);
-	}
-
-	if (!symbols) {
-		if (isEnd()) return;
-		await delay(500);
-
-		if (isEnd()) return;
-		logDebug('Third retry to get symbols');
+		logDebug(`Retry ${i + 1} to get symbols`);
 		symbols = await getSymbols(editor);
 	}
 
